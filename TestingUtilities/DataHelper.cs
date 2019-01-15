@@ -9,7 +9,6 @@ namespace TestingUtilities
     class DataHelper
     {
         private readonly Random _rng = new Random();
-
         private const string _chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz1234567980";
         private const string _charsNoSpace = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567980";
         private const string _AlphaOnlyCharsNoSpace = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
@@ -20,37 +19,11 @@ namespace TestingUtilities
             Random random = new Random();
             return Math.Round(random.NextDouble() * (maximum - minimum) + minimum, RoundToNumOfDecimals);
         }
-
-        public string RandomString(int size)
+        public static bool IsOdd(int value)
         {
-            char[] buffer = new char[size];
-
-            for (int i = 0; i < size; i++)
-            {
-                buffer[i] = _chars[_rng.Next(_chars.Length)];
-            }
-            return new string(buffer);
+            return value % 2 != 0;
         }
-        public string RandomString(int size, int SpacesOrNo)
-        {
-            char[] buffer = new char[size];
-            if (SpacesOrNo == 1)
-            {
-                for (int i = 0; i < size; i++)
-                {
-                    buffer[i] = _chars[_rng.Next(_chars.Length)];
-                }
-            }
-            else if (SpacesOrNo == 0)
-            {
-                for (int i = 0; i < size; i++)
-                {
-                    buffer[i] = _charsNoSpace[_rng.Next(_charsNoSpace.Length)];
-                }
-            }
-            return new string(buffer);
-        }
-        public string RandomString(int size, int SpacesOrNo, int NumericOrNo)
+        public string RandomString(int size, int SpacesOrNo = 0, int NumericOrNo = 0)
         {
             char[] buffer = new char[size];
 
@@ -114,6 +87,24 @@ namespace TestingUtilities
             }
 
             return Email;
+        }
+        public string RandomState(StateFormat stateFormat)
+        {
+
+            if (stateFormat == StateFormat.Long)
+            {
+                return RandomStringFromAList("Alabama,Alaska,Arizona,Arkansas,California,Colorado,Connecticut,Delaware,Florida,Georgia,Hawaii,Idaho,Illinois,Indiana,Iowa,Kansas,Kentucky,Louisiana,Maine,Maryland,Massachusetts,Michigan,Minnesota,Mississippi,Missouri,Montana,Nebraska,Nevada,New Hampshire,New Jersey,New Mexico,New York,North Carolina,North Dakota,Ohio,Oklahoma,Oregon,Pennsylvania,Rhode Island,South Carolina,South Dakota,Tennessee,Texas,Utah,Vermont,Virginia,Washington,West Virginia,Wisconsin,Wyoming", ",");
+            }
+            else if (stateFormat == StateFormat.Short)
+            {
+                return RandomStringFromAList("AL,AK,AZ,AR,CA,CO,CT,DE,FL,GA,HI,ID,IL,IN,IA,KS,KY,LA,ME,MD,MA,MI,MN,MS,MO,MT,NE,NV,NH,NJ,NM,NY,NC,ND,OH,OK,OR,PA,RI,SC,SD,TN,TX,UT,VT,VA,WA,WV,WI,WY", ",");
+            }
+            else { return ""; }
+        }
+        public enum StateFormat
+        {
+            Long,
+            Short
         }
     }
 }
