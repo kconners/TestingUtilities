@@ -13,75 +13,45 @@ namespace TestingUtilities
     {
         private static string FilePath { get; set; }
         private static JObject R;
-
         private static string _scriptname;
-        private static string _application;
-        private static string _client;
-        
-        public static void Client(this TestContext context, string Client)
-        {
-            _client = Client;
-        }
+
         public static void ScriptName(this TestContext context, string ScriptName)
         {
             _scriptname = ScriptName;
         }
-        public static void Application(this TestContext context, string Application)
+        public static string GetBrowserType(this TestContext context)
         {
-            _application = Application;
+
+            return getValue("browser", "chrome");
         }
 
-
-        public static string GetEnvironment(this TestContext context)
+        public static string GetHeadless(this TestContext context)
         {
-            return getValue("env", "dev");
-
-        }
-        public static string GetEnvironmentUrl(this TestContext context)
-        {
-            string url = "https://www.google.com/";
-
-
-            return url;
+            return getValue("headless", "no");
         }
         public static string GetRunMode(this TestContext context)
         {
 
-
-            return getValue( "runmode", "local");
+            return getValue("runmode", "local");
         }
-        public static string GetBrowserType(this TestContext context)
-        {
-
-            return getValue( "browser", "chrome");
-        }
-        public static string GetBackingData(this TestContext context)
-        {
-            return getValue( "backingdata", "db");
-        }
-        public static string GetJSONLocation(this TestContext context)
-        {
-            return getValue( "fullfilenameforjson", "");
-        }
-       
-        public static string GetUserName(this TestContext context)
-        {
-            return getValue( "UserName", "Automation");
-        }
-        public static string getClient(this TestContext context)
-        {
-            return getValue( "Client_Name", "LoyaltyWare");
-        }
-        public static string getApplication(this TestContext context)
-        {
-            return getValue( "Application", "");
-        }
-        
         public static string GetKillBrowser(this TestContext context)
         {
+
             return getValue("killbrowser", "Yes");
         }
-        
+        public static string GetEnvironment(this TestContext context)
+        {
+
+            return getValue("environment", "qa");
+        }
+        public static string GetCycleID(this TestContext context)
+        {
+
+            return getValue("runid", Convert.ToString(new Guid()));
+        }
+
+
+
         private static string getValue(string name, string Default)
         {
             var value = Default;
