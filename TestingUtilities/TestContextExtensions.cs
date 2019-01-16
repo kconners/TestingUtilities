@@ -19,6 +19,11 @@ namespace TestingUtilities
         {
             _scriptname = ScriptName;
         }
+        public static string GetApplication(this TestContext context)
+        {
+
+            return getValue("application", "website");
+        }
         public static string GetBrowserType(this TestContext context)
         {
 

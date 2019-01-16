@@ -22,6 +22,7 @@ namespace TestingUtilities
         public string browserType { get; set; }
         public string KillTheBrowserAtTheEnd { get; set; }
         public string PathToDrivers { get; set; }
+        public string application { get; set; }
         public Browser(TestContext context)
         {
             runMode = context.GetRunMode();
@@ -29,6 +30,7 @@ namespace TestingUtilities
             KillTheBrowserAtTheEnd = context.GetKillBrowser();
             env = context.GetEnvironment();
             headless = context.GetHeadless();
+            application = context.GetApplication();
         }
         private BrowserType GetBrowserType()
         {
@@ -122,9 +124,34 @@ namespace TestingUtilities
             we = new WebElem(this);
             return driv;
         }
+        public IWebDriver StartBrowser(string DirPath = "", int Zoom = 100)
+        {
+            string URL = string.Empty;
+            List<Models.URL> uRLs = new List<Models.URL>();
+            we = new WebElem(this);
+
+            if (DirPath == "")
+            {
+                DirPath = Path.GetDirectoryName(typeof(Browser).Assembly.Location) + @"..\..\..\TestConfig\urls.json";
+            }
+            using (StreamReader r = new StreamReader(DirPath))
+            {
+                string json = r.ReadToEnd();
+                we.Log(json);
+                uRLs = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Models.URL>>(json);
+            }
+
+            URL = uRLs.Where(i => i.environment.ToLower() == env.ToLower() && i.application.ToLower() == application.ToLower()).FirstOrDefault().url;
+
+            driv = OpenBrowser();
+            driv.Navigate().GoToUrl(URL);
+            ((IJavaScriptExecutor)driv).ExecuteScript("document.body.style.zoom='" + Convert.ToString(Zoom) + "%';");
+            we = new WebElem(this);
+            return driv;
+        }
 
 
-        
+
         public void Finish()
         {
             if (KillTheBrowserAtTheEnd.ToLower() == "yes" && driv != null)

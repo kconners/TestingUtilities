@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TestingUtilities
 {
-    class DataHelper
+    public class DataHelper
     {
         private readonly Random _rng = new Random();
 
