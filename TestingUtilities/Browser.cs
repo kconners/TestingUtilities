@@ -151,7 +151,30 @@ namespace TestingUtilities
         }
 
 
-
+        public bool SwitchToTab(string title)
+        {
+            try
+            {
+                IList<string> tabs = new List<string>(driv.WindowHandles);
+                int countr = 0;
+                while (countr < 5)
+                {
+                    driv.SwitchTo().Window(tabs[countr]);
+                    Console.WriteLine(string.Format("Logging message: '{0}'", driv.Title.Trim().ToLower()));
+                    if (driv.Title.Trim().ToLower() == title.Trim().ToLower())
+                    {
+                        break;
+                    }
+                    countr = countr + 1;
+                }
+                return true;
+            }
+            catch
+            {
+                Assert.Fail("This was broken");
+                return false;
+            }
+        }
         public void Finish()
         {
             if (KillTheBrowserAtTheEnd.ToLower() == "yes" && driv != null)

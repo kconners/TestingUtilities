@@ -2,25 +2,31 @@
 <package >
   <metadata>
     <id>TestCentral.GUI</id>
-    <version>1.0.0</version>
+    <version>1.0.9</version>
     <authors>kconners</authors>
     <owners>kconners</owners> 
     <projectUrl>https://github.com/kconners/TestingUtil</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>A simple utility that will assist automation efforts</description>
-    <releaseNotes>Initial Build</releaseNotes>
-    <copyright>Copyright 2018</copyright>
+    <releaseNotes>Updating Newtsonsoft and Fluentassertion versions</releaseNotes>
+    <copyright>Copyright 2019</copyright>
+    <license type="expression">MIT</license>
     <tags>KDC</tags>
     <dependencies>
       <dependency id="Selenium.WebDriver" version="3.141.0" />
 	  <dependency id="Selenium.Support" version="3.141.0" />
-	  <dependency id="Newtonsoft.Json" version="11.0.2" />
+	  <dependency id="Newtonsoft.Json" version="12.0.1" />
 	  <dependency id="RestSharp" version="106.2.2" />
 	  <dependency id="NUnit" version="3.11.0" />
 	  <dependency id="Nunit3TestAdapter" version="3.12.0" />	  
-	  <dependency id="FluentAssertions" version="5.3.0" />
+	  <dependency id="FluentAssertions" version="5.6.0" />
 	  <dependency id="MSTest.TestAdapter" version="1.4.0" />
 	  <dependency id="Microsoft.VisualStudio.TestPlatform" version="14.0.0.1" />
     </dependencies>
   </metadata>
+<files>
+<file src=".\TestingUtilities\bin\Debug\TestingUtilities.dll" target="lib\TestingUtilities" />
+<file src=".\TestingUtilities\Testing_Objects.cs" target="content\Testing_Objects_Example.cs" />
+<file src=".\TestingUtilities\urls.json" target="content\urls_Example.json" />
+</files>
  </package>
