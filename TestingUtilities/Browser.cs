@@ -23,6 +23,8 @@ namespace TestingUtilities
         public string KillTheBrowserAtTheEnd { get; set; }
         public string PathToDrivers { get; set; }
         public string application { get; set; }
+        public string runID { get; set; }
+        public string logLevel { get; set; }
         public Browser(TestContext context)
         {
             runMode = context.GetRunMode();
@@ -31,6 +33,8 @@ namespace TestingUtilities
             env = context.GetEnvironment();
             headless = context.GetHeadless();
             application = context.GetApplication();
+            runID = context.GetCycleID();
+            logLevel = context.GetLogLevel();
         }
         private BrowserType GetBrowserType()
         {
@@ -137,7 +141,7 @@ namespace TestingUtilities
             using (StreamReader r = new StreamReader(DirPath))
             {
                 string json = r.ReadToEnd();
-                we.Log(json);
+            //    we.Log(json);
                 uRLs = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Models.URL>>(json);
             }
 

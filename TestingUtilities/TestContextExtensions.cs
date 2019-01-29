@@ -54,8 +54,11 @@ namespace TestingUtilities
 
             return getValue("runid", Convert.ToString(new Guid()));
         }
-
-
+        public static string GetLogLevel(this TestContext context)
+        {
+            return getValue("loglevel", "all");
+        }
+        
 
         private static string getValue(string name, string Default)
         {
