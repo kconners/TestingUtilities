@@ -27,7 +27,7 @@ namespace TestingUtilities
         {
             this.driv = b.driv;
             lines = new List<LogItem>();
-            lines.Add(new LogItem { LogLevel = LogLevel.always, LogMessage = "Start Logging" });
+            lines.Add(new LogItem { LogLevel = loglevel.always, LogMessage = "Start Logging" });
             RunID = b.runID;
 
             foreach (var ll in b.logLevel.Split(','))
@@ -157,9 +157,9 @@ namespace TestingUtilities
         public void Log(string Message)
         {
             Console.WriteLine(string.Format("Logging message: '{0}'", Message));
-            lines.Add(new LogItem { LogLevel = LogLevel.always, LogMessage = string.Format("Logging message: '{0}'", Message) });
+            lines.Add(new LogItem { LogLevel = loglevel.always, LogMessage = string.Format("Logging message: '{0}'", Message) });
         }
-        public void Log(LogLevel logLevel,string Message)
+        public void Log(loglevel logLevel,string Message)
         {
             Console.WriteLine(string.Format("Logging message: '{0}'", Message));
             lines.Add(new LogItem { LogLevel = logLevel, LogMessage = string.Format("Logging message: '{0}'", Message) });
@@ -225,9 +225,9 @@ namespace TestingUtilities
 
             string DirPath = Path.GetDirectoryName(typeof(Browser).Assembly.Location) + @"..\..\..\Logs\"+Year+"_"+ Month + "_" + Day + "_" + Hour + "_" + Min + "_" + Second + ".txt";
             Log(DirPath);
-            if (!LogLevels.Contains(LogLevel.all.ToString()))
+            if (!LogLevels.Contains(loglevel.all.ToString()))
             {
-                lines = lines.Where(i => LogLevels.Contains(i.LogLevel.ToString()) || i.LogLevel == LogLevel.always).ToList();
+                lines = lines.Where(i => LogLevels.Contains(i.LogLevel.ToString()) || i.LogLevel == loglevel.always).ToList();
             }
             
             List<string> mssage = new List<string>();
@@ -572,7 +572,7 @@ namespace TestingUtilities
 
                     HighLight(HH, 1);
                     countr++;
-                    Log(LogLevel.debug, string.Format("Can't click {0} on attempt number {1}", Convert.ToString(HH), Convert.ToString(countr)));
+                    Log(loglevel.debug, string.Format("Can't click {0} on attempt number {1}", Convert.ToString(HH), Convert.ToString(countr)));
                 }
 
             }
@@ -625,7 +625,7 @@ namespace TestingUtilities
 
         private class LogItem
         {
-            public LogLevel LogLevel { get; set; }
+            public loglevel LogLevel { get; set; }
             public string LogMessage { get; set; }
         }
         public enum Direction
@@ -633,7 +633,7 @@ namespace TestingUtilities
             Down,
             Up
         }
-        public enum LogLevel
+        public enum loglevel
         {
             all,
             always,
