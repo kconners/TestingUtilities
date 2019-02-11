@@ -27,7 +27,7 @@ namespace TestingUtilities
         {
             this.driv = b.driv;
             lines = new List<LogItem>();
-            lines.Add(new LogItem { LogLevel = loglevel.always, LogMessage = "Start Logging" });
+            lines.Add(new LogItem { LogLevel = loglevel.always, LogMessage = string.Format("Start Logging for test {0}", NUnit.Framework.TestContext.CurrentContext.Test.Name) });
             RunID = b.runID;
 
             foreach (var ll in b.logLevel.Split(','))
@@ -223,7 +223,7 @@ namespace TestingUtilities
             Min = Convert.ToString(dateTime.Minute);
             Second = Convert.ToString(dateTime.Second);
 
-            string DirPath = Path.GetDirectoryName(typeof(Browser).Assembly.Location) + @"..\..\..\Logs\"+Year+"_"+ Month + "_" + Day + "_" + Hour + "_" + Min + "_" + Second + ".txt";
+            string DirPath = Path.GetDirectoryName(typeof(Browser).Assembly.Location) + @"..\..\..\..\Logs\"+ NUnit.Framework.TestContext.CurrentContext.Test.ClassName + Year+"_"+ Month + "_" + Day + "_" + Hour + "_" + Min + "_" + Second + ".txt";
             Log(DirPath);
             if (!LogLevels.Contains(loglevel.all.ToString()))
             {
@@ -233,9 +233,9 @@ namespace TestingUtilities
             List<string> mssage = new List<string>();
 
 
-            foreach (var LogMessage in lines)
+            foreach (var LogMessage in lines.OrderBy(i => i.TestCase).ThenBy(c => c.now))
             {
-                mssage.Add(LogMessage.LogLevel.ToString() + " " + LogMessage.LogMessage);
+                mssage.Add(LogMessage.TestCase.ToString() + " " + LogMessage.now.ToString() + " " + LogMessage.LogLevel.ToString() + " " + LogMessage.LogMessage);
             }
 
             System.IO.File.WriteAllLines(DirPath, mssage.ToArray());
@@ -626,7 +626,10 @@ namespace TestingUtilities
         private class LogItem
         {
             public loglevel LogLevel { get; set; }
+            public Guid TestRunID { get; set; }
             public string LogMessage { get; set; }
+            public string TestCase = NUnit.Framework.TestContext.CurrentContext.Test.FullName;
+            public DateTime now = DateTime.Now;
         }
         public enum Direction
         {

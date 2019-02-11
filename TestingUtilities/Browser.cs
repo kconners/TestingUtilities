@@ -35,6 +35,8 @@ namespace TestingUtilities
             application = context.GetApplication();
             runID = context.GetCycleID();
             logLevel = context.GetLogLevel();
+
+
         }
         private BrowserType GetBrowserType()
         {
@@ -141,20 +143,19 @@ namespace TestingUtilities
             using (StreamReader r = new StreamReader(DirPath))
             {
                 string json = r.ReadToEnd();
-            //    we.Log(json);
+            
                 uRLs = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Models.URL>>(json);
             }
 
             URL = uRLs.Where(i => i.environment.ToLower() == env.ToLower() && i.application.ToLower() == application.ToLower()).FirstOrDefault().url;
-
+            we.Log(URL);
             driv = OpenBrowser();
             driv.Navigate().GoToUrl(URL);
             ((IJavaScriptExecutor)driv).ExecuteScript("document.body.style.zoom='" + Convert.ToString(Zoom) + "%';");
             we = new WebElem(this);
             return driv;
         }
-
-
+       
         public bool SwitchToTab(string title)
         {
             try
