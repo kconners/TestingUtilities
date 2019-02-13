@@ -23,6 +23,12 @@ namespace TestingUtilities
         {
             return value % 2 != 0;
         }
+        public string RandomPhoneNumber()
+        {
+            string value = string.Empty;
+            value = Convert.ToString(GetRandomNumber(200, 999, 0)) + Convert.ToString(GetRandomNumber(2000000, 9999999, 0));
+            return value;
+                }
         public string RandomString(int size, int SpacesOrNo = 0, int NumericOrNo = 0)
         {
             char[] buffer = new char[size];

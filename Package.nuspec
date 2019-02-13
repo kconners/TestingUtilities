@@ -2,13 +2,13 @@
 <package >
   <metadata>
     <id>TestCentral.GUI</id>
-    <version>2.0.9</version>
+    <version>2.0.10</version>
     <authors>kconners</authors>
     <owners>kconners</owners> 
     <projectUrl>https://github.com/kconners/TestingUtil</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>A simple utility that will assist automation efforts</description>
-    <releaseNotes>Changed the LogLevel class to loglevel to remedy abigiuos Class names</releaseNotes>
+    <releaseNotes>Added Phone number to DataHelper Class</releaseNotes>
     <copyright>Copyright 2019</copyright>
     <license type="expression">MIT</license>
     <tags>KDC</tags>
@@ -16,6 +16,7 @@
       <dependency id="Selenium.WebDriver" version="3.141.0" />
 	  <dependency id="Selenium.Support" version="3.141.0" />
 	  <dependency id="Newtonsoft.Json" version="12.0.1" />
+	  <dependency id="Selenium.WebDriver.ChromeDriver" version="2.46.0" />
 	  <dependency id="RestSharp" version="106.2.2" />
 	  <dependency id="NUnit" version="3.11.0" />
 	  <dependency id="Nunit3TestAdapter" version="3.12.0" />	  
