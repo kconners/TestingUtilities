@@ -73,7 +73,7 @@ namespace TestingUtilities
                 options.AddUserProfilePreference("safebrowsing", "enabled");
                 string curentDir = System.IO.Directory.GetCurrentDirectory();
                 Console.WriteLine(curentDir);
-                driv = new OpenQA.Selenium.Chrome.ChromeDriver(@"C:\Drivers", options);
+                driv = new OpenQA.Selenium.Chrome.ChromeDriver(options);
             }
 
             return driv;
