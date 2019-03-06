@@ -14,6 +14,7 @@ using FluentAssertions;
 using System.Threading;
 using SeleniumExtras.WaitHelpers;
 using System.IO;
+using NUnit.Framework;
 
 
 namespace TestingUtilities
@@ -41,6 +42,22 @@ namespace TestingUtilities
         }
         public WebElem()
         {
+
+        }
+
+
+
+        public WebElem(TestContext context)
+        {
+            
+            lines = new List<LogItem>();
+            lines.Add(new LogItem { LogLevel = loglevel.always, LogMessage = string.Format("Start Logging for test {0}", NUnit.Framework.TestContext.CurrentContext.Test.Name) });
+            RunID = Convert.ToString(Guid.NewGuid());
+
+            foreach (var ll in context.GetLogLevel().Split(','))
+            {
+                LogLevels.Add(ll.Trim().ToLower());
+            }
         }
         public IWebDriver driv;
         public int GlobalTimeOUT = 10;

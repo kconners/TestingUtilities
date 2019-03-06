@@ -2,13 +2,13 @@
 <package >
   <metadata>
     <id>TestCentral.GUI</id>
-    <version>2.0.12</version>
+    <version>2.1.0</version>
     <authors>kconners</authors>
     <owners>kconners</owners> 
     <projectUrl>https://github.com/kconners/TestingUtil</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>A simple utility that will assist automation efforts</description>
-    <releaseNotes>Added Phone number to DataHelper Class</releaseNotes>
+    <releaseNotes>Added Rest helper</releaseNotes>
     <copyright>Copyright 2019</copyright>
     <license type="expression">MIT</license>
     <tags>KDC</tags>
