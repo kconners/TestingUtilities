@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>TestCentral.GUI</id>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <authors>kconners</authors>
     <owners>kconners</owners> 
     <projectUrl>https://github.com/kconners/TestingUtil</projectUrl>
@@ -23,4 +23,7 @@
 	  <dependency id="Microsoft.VisualStudio.TestPlatform" version="14.0.0.1" />
     </dependencies>
   </metadata>
+ <files>
+  <file src= "C:\Users\kdcnt\source\repos\TestingUtilities\TestingUtilities\bin\Debug\TestingUtilities.dll" target= "lib\TestingUtilities.dll"/>
+ </files>
  </package>
