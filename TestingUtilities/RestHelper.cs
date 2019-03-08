@@ -125,36 +125,52 @@ namespace TestingUtilities
         }
 
 
-        public Models.Rest.RestResponce PUT(string _route, Dictionary<string, string> QueryParams, object body)
+        public Models.Rest.RestResponce PUT(string _route, Dictionary<string, string> QueryParams, object body, bool GetAuth = false)
         {
             return MakeCall(verb.put, _route, QueryParams, body);
         }
-        public Models.Rest.RestResponce PUT(string _route, object body)
+        public Models.Rest.RestResponce PUT(string _route, object body, bool GetAuth = false)
         {
             return MakeCall(verb.put, _route, new Dictionary<string, string> { }, body);
         }
         
-        public Models.Rest.RestResponce POST(string _route, object body)
+        public Models.Rest.RestResponce POST(string _route, object body, bool GetAuth = false)
         {
-            return MakeCall(verb.post, _route, new Dictionary<string, string> { }, body);
+            if (GetAuth == true)
+            {
+                return MakeCall(verb.post, _route, new Dictionary<string, string> { }, body);
+            }
+            else
+            {
+                return MakeCallNoAuth(verb.post, _route, new Dictionary<string, string> { }, body);
+            }
+
         }
-        public Models.Rest.RestResponce POST(string _route, Dictionary<string, string> QueryParams, object body)
+        public Models.Rest.RestResponce POST(string _route, Dictionary<string, string> QueryParams, object body, bool GetAuth = false)
         {
             return MakeHTTPClientCall(verb.post, _route, QueryParams, body);
         }
         
-        public Models.Rest.RestResponce PATCH(string _route, Dictionary<string, string> QueryParams, object body)
+        public Models.Rest.RestResponce PATCH(string _route, Dictionary<string, string> QueryParams, object body, bool GetAuth = false)
         {
             return MakeCall(verb.patch, _route, QueryParams, body);
         }
-        public Models.Rest.RestResponce PATCH(string _route, object body)
+        public Models.Rest.RestResponce PATCH(string _route, object body, bool GetAuth = false)
         {
             return MakeCall(verb.patch, _route, new Dictionary<string, string> { }, body);
         }
         
         public Models.Rest.RestResponce GET(string _route, Dictionary<string, string> QueryParams, bool GetAuth = false)
         {
-            return MakeCall(verb.get, _route, QueryParams);
+            if (GetAuth == true)
+            {
+                return MakeCall(verb.get, _route, QueryParams);
+            }
+            else
+            {
+                return MakeCallNoAuth(verb.get, _route, QueryParams);
+            }
+
         }
         public Models.Rest.RestResponce GET(string _route, bool GetAuth = false)
         {
@@ -325,50 +341,58 @@ namespace TestingUtilities
             
             var response = client.Execute(request);
             string L = response.Content;
-
+            Console.WriteLine(L);
             JObject respo = Newtonsoft.Json.JsonConvert.DeserializeObject<JObject>(L);
-
-            restResponce.data = respo[dataProperty];
-            restResponce.status = respo.Value<string>(statusProperty);
-            restResponce.userMessage = respo.Value<string>(messageProperty);
-            restResponce.responseCode = respo.Value<int>(responseCodeProperty);
-
-            restResponce.isError = Convert.ToBoolean(respo.Value<string>("isError"));
-            restResponce.developerMessage = respo["developerMessage"];
-            restResponce.moreInfo = respo["moreInfo"];
-            restResponce.httpStatusCode = respo.Value<int>("httpStatusCode");
-
-
-            if (restResponce.isError == true)
+            try
             {
-                restResponce.errors = new List<Rest.Error>();
-                try
-                {
-                    JArray errors = (JArray)respo["errors"];
-                    foreach (var i in errors)
-                    {
-                        Rest.Error error = new Rest.Error();
-                        error._object = i.Value<string>("object");
-                        error._key = i.Value<string>("key");
-                        error._value = i.Value<string>("value");
-                        error._isVisible = i.Value<bool>("isVisible");
-                        error._errorMessage = i.Value<string>("errorMessage");
+                restResponce.data = respo[dataProperty];
+                restResponce.status = respo.Value<string>(statusProperty);
+                restResponce.userMessage = respo.Value<string>(messageProperty);
+                restResponce.responseCode = respo.Value<int>(responseCodeProperty);
 
-                        restResponce.errors.Add(error);
+                restResponce.isError = Convert.ToBoolean(respo.Value<string>("isError"));
+                restResponce.developerMessage = respo["developerMessage"];
+                restResponce.moreInfo = respo["moreInfo"];
+                restResponce.httpStatusCode = respo.Value<int>("httpStatusCode");
+
+
+                if (restResponce.isError == true)
+                {
+                    restResponce.errors = new List<Rest.Error>();
+                    try
+                    {
+                        JArray errors = (JArray)respo["errors"];
+                        foreach (var i in errors)
+                        {
+                            Rest.Error error = new Rest.Error();
+                            error._object = i.Value<string>("object");
+                            error._key = i.Value<string>("key");
+                            error._value = i.Value<string>("value");
+                            error._isVisible = i.Value<bool>("isVisible");
+                            error._errorMessage = i.Value<string>("errorMessage");
+
+                            restResponce.errors.Add(error);
+                        }
+                    }
+                    catch
+                    {
+                        JObject error = (JObject)respo["errors"];
+                        Rest.Error er = new Rest.Error();
+                        er._object = error.Value<string>("object");
+                        er._key = error.Value<string>("key");
+                        er._value = error.Value<string>("value");
+                        er._isVisible = error.Value<bool>("isVisible");
+                        er._errorMessage = error.Value<string>("errorMessage");
+
+                        restResponce.errors.Add(er);
                     }
                 }
-                catch
-                {
-                    JObject error = (JObject)respo["errors"];
-                    Rest.Error er = new Rest.Error();
-                    er._object = error.Value<string>("object");
-                    er._key = error.Value<string>("key");
-                    er._value = error.Value<string>("value");
-                    er._isVisible = error.Value<bool>("isVisible");
-                    er._errorMessage = error.Value<string>("errorMessage");
-
-                    restResponce.errors.Add(er);
-                }
+            }
+            catch
+            {
+            Console.WriteLine(L);
+                restResponce.data = L;
+                restResponce.httpStatusCode = Convert.ToInt16(response.StatusCode);
             }
 
             return restResponce;
