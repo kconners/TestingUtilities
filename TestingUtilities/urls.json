@@ -1,0 +1,12 @@
+﻿[
+  {
+    "application": "gh.com",
+    "environment": "qa",
+    "url": "https://scqa01.greyhound.com"
+  },
+  {
+    "application": "gh.com",
+    "environment": "stage",
+    "url": "https://scstg01.greyhound.com"
+  }
+]
