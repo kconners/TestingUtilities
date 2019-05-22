@@ -16,6 +16,10 @@ namespace TestingUtilities
     {
         public WebElem we { get; set; }
         public IWebDriver driv { get; set; }
+
+        private ClickSetting _clickSetting { get; set; }
+        private TypeSetting _typeSetting { get; set; }
+
         public string runMode { get; set; }
         public string env { get; set; }
         public string headless { get; set; }
@@ -25,6 +29,9 @@ namespace TestingUtilities
         public string application { get; set; }
         public string runID { get; set; }
         public string logLevel { get; set; }
+
+        private int _PageTimeout { get; set; }
+        private int _PollInterval { get; set; }
         public Browser(TestContext context)
         {
             runMode = context.GetRunMode();
@@ -35,7 +42,11 @@ namespace TestingUtilities
             application = context.GetApplication();
             runID = context.GetCycleID();
             logLevel = context.GetLogLevel();
+            _PageTimeout = Convert.ToInt32(context.GetTimeOut());
+            _PollInterval = Convert.ToInt32(context.GetPollIntervalInMilliseconds());
 
+            _clickSetting = new ClickSetting() { PageTimeout = TimeSpan.FromSeconds(_PageTimeout), PollInterval = TimeSpan.FromMilliseconds(_PollInterval) };
+            _typeSetting = new TypeSetting() { PageTimeout = TimeSpan.FromSeconds(_PageTimeout), PollInterval = TimeSpan.FromMilliseconds(_PollInterval) };
 
         }
         private BrowserType GetBrowserType()
@@ -104,7 +115,7 @@ namespace TestingUtilities
 
             return driv;
         }
-        public IWebDriver StartBrowser(string URL)
+        public IWebDriver StartBrowser(string URL )
         {
             driv = OpenBrowser();
             driv.Navigate().GoToUrl(URL);
@@ -151,7 +162,7 @@ namespace TestingUtilities
             we.Log(URL);
             driv = OpenBrowser();
             driv.Navigate().GoToUrl(URL);
-            ((IJavaScriptExecutor)driv).ExecuteScript("document.body.style.zoom='" + Convert.ToString(Zoom) + "%';");
+       //     ((IJavaScriptExecutor)driv).ExecuteScript("document.body.style.zoom='" + Convert.ToString(Zoom) + "%';");
             we = new WebElem(this);
             return driv;
         }

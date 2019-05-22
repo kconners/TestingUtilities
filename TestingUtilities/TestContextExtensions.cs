@@ -58,7 +58,18 @@ namespace TestingUtilities
         {
             return getValue("loglevel", "all");
         }
-        
+
+        public static string GetTimeOut(this TestContext context)
+        {
+
+            return getValue("pagetimeout", "10");
+        }
+
+        public static string GetPollIntervalInMilliseconds(this TestContext context)
+        {
+
+            return getValue("pollinterval", "25");
+        }
 
         private static string getValue(string name, string Default)
         {

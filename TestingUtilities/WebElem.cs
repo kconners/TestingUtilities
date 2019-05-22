@@ -19,13 +19,22 @@ using NUnit.Framework;
 
 namespace TestingUtilities
 {
+   
+
     public class WebElem
     {
+        private ClickSetting clickSetting { get; set; }
+        private TypeSetting typeSetting { get; set; }
 
         private string RunID = string.Empty;
         private List<string> LogLevels = new List<string>();
+
         public WebElem(Browser b)
         {
+            countr = 0;
+            clickSetting = b.we.clickSetting;
+            typeSetting = b.we.typeSetting;
+
             this.driv = b.driv;
             lines = new List<LogItem>();
             lines.Add(new LogItem { LogLevel = loglevel.always, LogMessage = string.Format("Start Logging for test {0}", NUnit.Framework.TestContext.CurrentContext.Test.Name) });
@@ -36,20 +45,29 @@ namespace TestingUtilities
                 LogLevels.Add(ll.Trim().ToLower());
             }
         }
-        public WebElem(IWebDriver Driv)
+        public WebElem(IWebDriver Driv, ClickSetting defaultClickSettings, TypeSetting defaultTypeSetting)
         {
+            countr = 0;
+            clickSetting = defaultClickSettings;
+            typeSetting = defaultTypeSetting;
             driv = Driv;
         }
         public WebElem()
         {
-
         }
-
-
-
         public WebElem(TestContext context)
         {
-            
+            countr = 0;
+
+            int _PageTimeout;
+            int _PollInterval;
+
+            _PageTimeout = Convert.ToInt32(context.GetTimeOut());
+            _PollInterval = Convert.ToInt32(context.GetPollIntervalInMilliseconds());
+
+            clickSetting = new ClickSetting() { PageTimeout = TimeSpan.FromSeconds(_PageTimeout), PollInterval = TimeSpan.FromMilliseconds(_PollInterval) };
+            typeSetting = new TypeSetting() { PageTimeout = TimeSpan.FromSeconds(_PageTimeout), PollInterval = TimeSpan.FromMilliseconds(_PollInterval) };
+
             lines = new List<LogItem>();
             lines.Add(new LogItem { LogLevel = loglevel.always, LogMessage = string.Format("Start Logging for test {0}", NUnit.Framework.TestContext.CurrentContext.Test.Name) });
             RunID = Convert.ToString(Guid.NewGuid());
@@ -59,9 +77,8 @@ namespace TestingUtilities
                 LogLevels.Add(ll.Trim().ToLower());
             }
         }
-        public IWebDriver driv;
-        public int GlobalTimeOUT = 10;
 
+        public IWebDriver driv;
         private List<LogItem> lines;
         // WriteAllLines creates a file, writes a collection of strings to the file,
         // and then closes the file.  You do NOT need to call Flush() or Close().
@@ -83,38 +100,103 @@ namespace TestingUtilities
             IAlert alert = driv.SwitchTo().Alert();
             alert.Accept();
         }
-        public void Clear(by ByString, int TimeoutSeconds = 10)
+        public void Clear(by ByString)
         {
-            var wait = new WebDriverWait(driv, TimeSpan.FromSeconds(TimeoutSeconds));
+            var wait = new WebDriverWait(driv, typeSetting.PageTimeout);
             wait.Until(driver => driv.FindElement(ByString));
             wait.Until(driver => driv.FindElement(ByString).Enabled == true);   
             driv.FindElement(ByString).Clear(); 
         }
-        public void Click(by ByString, int TimeoutSeconds = 10)
+        
+        public void Click(by ByString)
         {
-            var wait = new WebDriverWait(driv, TimeSpan.FromSeconds(TimeoutSeconds));
+            var wait = new WebDriverWait(driv, clickSetting.PageTimeout);
             wait.Until(driver => driv.FindElement(ByString));
             scrollintoView(driv.FindElement(ByString));
             IWebElement item = driv.FindElement(ByString);
-            Click(item, ByString.Description, TimeoutSeconds);
+            Click(item, ByString.Description);
         }
-        public void Click(IWebElement item,string elementDescription, int TimeoutSeconds = 10)
+        public void Click(IWebElement item,string elementDescription)
         {
             countr = 0;
+
             bool didItWork = false;
-            HH = item;
-            TimeOutSeconds = TimeoutSeconds * 2;
             aTimer = new System.Timers.Timer();
-            aTimer.Interval = 500;
+            aTimer.Interval = clickSetting.PollInterval.TotalMilliseconds;
             aTimer.Elapsed += TimedClickOnWebElement;
             aTimer.Enabled = true;
             while (aTimer.Enabled == true)
             { }
-            if (countr > TimeoutSeconds && WasSuccessful == false) { didItWork = false; }
-            else if (countr <= TimeoutSeconds || WasSuccessful == true) { didItWork = true; }
+            if (countr > clickSetting.MaxPollCount && WasSuccessful == false) 
+                    { 
+                        didItWork = false; 
+                    }
+            else if (countr <= clickSetting.MaxPollCount || WasSuccessful == true)  
+                    { 
+                        didItWork = true;
+                    }
             aTimer.Dispose();
             didItWork.Should().BeTrue();
+            countr = 0;
         }
+
+        public void Click(by ByString, ClickSetting click)
+        {
+            var wait = new WebDriverWait(driv, click.PageTimeout);
+            wait.Until(driver => driv.FindElement(ByString));
+            scrollintoView(driv.FindElement(ByString));
+            IWebElement item = driv.FindElement(ByString);
+            Click(item, ByString.Description);
+        }
+        public void Click(IWebElement item,string elementDescription, ClickSetting click)
+        {
+            countr = 0;
+
+            bool didItWork = false;
+            aTimer = new System.Timers.Timer();
+            aTimer.Interval = clickSetting.PollInterval.TotalMilliseconds;
+            aTimer.Elapsed += TimedClickOnWebElement;
+            aTimer.Enabled = true;
+            while (aTimer.Enabled == true)
+            { }
+            if (countr > clickSetting.MaxPollCount && WasSuccessful == false) 
+                    { 
+                        didItWork = false; 
+                    }
+            else if (countr <= clickSetting.MaxPollCount || WasSuccessful == true)  
+                    { 
+                        didItWork = true;
+                    }
+            aTimer.Dispose();
+            didItWork.Should().BeTrue();
+            countr = 0;
+        }
+
+        public void Click(by Parent, string XpathToClick)
+        {
+            var wait = new WebDriverWait(driv, clickSetting.PageTimeout);
+            var wait2 = new WebDriverWait(driv, clickSetting.PageTimeout);
+            wait.Until(driver => driv.FindElement(Parent));
+            IWebElement Par = driv.FindElement(Parent);
+
+            wait2.Until(driver => Par.FindElement(By.XPath(XpathToClick)));
+            scrollintoView(Par.FindElement(By.XPath(XpathToClick)));
+            IWebElement item = Par.FindElement(By.XPath(XpathToClick));
+            Click(item, string.Format("The child at xpath='{0}' of Parent = '{1}'", XpathToClick, Parent.Description));
+        }
+        public void Click(by Parent, string XpathToClick, ClickSetting click)
+        {
+            var wait = new WebDriverWait(driv, click.PageTimeout);
+            var wait2 = new WebDriverWait(driv, click.PageTimeout);
+            wait.Until(driver => driv.FindElement(Parent));
+            IWebElement Par = driv.FindElement(Parent);
+
+            wait2.Until(driver => Par.FindElement(By.XPath(XpathToClick)));
+            scrollintoView(Par.FindElement(By.XPath(XpathToClick)));
+            IWebElement item = Par.FindElement(By.XPath(XpathToClick));
+            Click(item, string.Format("The child at xpath='{0}' of Parent = '{1}'", XpathToClick, Parent.Description), click);
+        }
+        
         public bool DidPageLoad(by THeElement, bool TrueToHighLight = false, int timeout = 10)
         {
             try
@@ -195,10 +277,10 @@ namespace TestingUtilities
             selectElement.SelectByText(ValueToSelect);
 
         }
-        public void SetCheckBox(by CheckBox, bool ShouldBeChecked, int TimeoutSeconds = 10)
+        public void SetCheckBox(by CheckBox, bool ShouldBeChecked)
         {
 
-            var wait = new WebDriverWait(driv, TimeSpan.FromSeconds(TimeoutSeconds));
+            var wait = new WebDriverWait(driv, clickSetting.PageTimeout);
             wait.Until(driver => driv.FindElement(CheckBox));
 
             bool IsCurrentlyChecked = Convert.ToBoolean(GetValue(CheckBox));
@@ -209,10 +291,24 @@ namespace TestingUtilities
             }
 
         }
-        public void SetCheckBox(by CheckBox, by ClickForCheck, bool ShouldBeChecked, int TimeoutSeconds = 10)
+        public void SetCheckBox(by CheckBox, bool ShouldBeChecked, ClickSetting clickSetting)
         {
 
-            var wait = new WebDriverWait(driv, TimeSpan.FromSeconds(TimeoutSeconds));
+            var wait = new WebDriverWait(driv, clickSetting.PageTimeout);
+            wait.Until(driver => driv.FindElement(CheckBox));
+
+            bool IsCurrentlyChecked = Convert.ToBoolean(GetValue(CheckBox));
+
+            if (IsCurrentlyChecked != ShouldBeChecked)
+            {
+                Click(CheckBox, clickSetting);
+            }
+
+        }
+        public void SetCheckBox(by CheckBox, by ClickForCheck, bool ShouldBeChecked, ClickSetting clickSetting)
+        {
+
+            var wait = new WebDriverWait(driv, clickSetting.PageTimeout);
             wait.Until(driver => driv.FindElement(CheckBox));
             scrollintoView(driv.FindElement(CheckBox));
 
@@ -221,7 +317,7 @@ namespace TestingUtilities
 
             if (IsCurrentlyChecked != ShouldBeChecked)
             {
-                Click(ClickForCheck);
+                Click(ClickForCheck, clickSetting);
             }
 
         }
@@ -319,13 +415,13 @@ namespace TestingUtilities
             highlightJavascript = tEst + ";";
             jsDriver.ExecuteScript(highlightJavascript, new object[] { element });
         }
-        public void ClickAnchorInTable(by Table, string Find, int ColumNumber, string ButtonToClick, int NumberOfPagesToCheck = 10, int TimeToWaitPerPage = 10)
+        public void ClickAnchorInTable(by Table, string Find, int ColumNumber, string ButtonToClick, int NumberOfPagesToCheck = 10)
         {
 
             int startr = 2;
             try
             {
-                Click(Table, ".//td[contains(.,'" + Find + "') and  position() = " + ColumNumber + "]/..//a[contains(.,'" + ButtonToClick + "')]", TimeToWaitPerPage);
+                Click(Table, ".//td[contains(.,'" + Find + "') and  position() = " + ColumNumber + "]/..//a[contains(.,'" + ButtonToClick + "')]");
             }
             catch
             {
@@ -335,7 +431,7 @@ namespace TestingUtilities
                     {
                         Click(new by(By.XPath(".//a[contains(.,'" + Convert.ToString(startr) + "')]"), string.Format("The anchor representing the {0} page of the table {1}", Convert.ToString(startr), Table.Description)));
 
-                        Click(Table, ".//td[contains(.,'" + Find + "') and  position() = " + ColumNumber + "]/..//a[contains(.,'" + ButtonToClick + "')]", TimeToWaitPerPage);
+                        Click(Table, ".//td[contains(.,'" + Find + "') and  position() = " + ColumNumber + "]/..//a[contains(.,'" + ButtonToClick + "')]");
                         break;
                     }
                     catch { }
@@ -344,18 +440,32 @@ namespace TestingUtilities
             }
 
         }
-        public void Click(by Parent, string XpathToClick, int TimeoutSeconds = 10)
+        public void ClickAnchorInTable(by Table, string Find, int ColumNumber, string ButtonToClick, ClickSetting clickSetting,int NumberOfPagesToCheck = 10)
         {
-            var wait = new WebDriverWait(driv, TimeSpan.FromSeconds(TimeoutSeconds));
-            var wait2 = new WebDriverWait(driv, TimeSpan.FromSeconds(TimeoutSeconds));
-            wait.Until(driver => driv.FindElement(Parent));
-            IWebElement Par = driv.FindElement(Parent);
 
-            wait2.Until(driver => Par.FindElement(By.XPath(XpathToClick)));
-            scrollintoView(Par.FindElement(By.XPath(XpathToClick)));
-            IWebElement item = Par.FindElement(By.XPath(XpathToClick));
-            Click(item, string.Format("The child at xpath='{0}' of Parent = '{1}'",XpathToClick,Parent.Description), TimeoutSeconds);
+            int startr = 2;
+            try
+            {
+                Click(Table, ".//td[contains(.,'" + Find + "') and  position() = " + ColumNumber + "]/..//a[contains(.,'" + ButtonToClick + "')]", clickSetting);
+            }
+            catch
+            {
+                while (startr <= NumberOfPagesToCheck)
+                {
+                    try
+                    {
+                        Click(new by(By.XPath(".//a[contains(.,'" + Convert.ToString(startr) + "')]"), string.Format("The anchor representing the {0} page of the table {1}", Convert.ToString(startr), Table.Description)), clickSetting);
+
+                        Click(Table, ".//td[contains(.,'" + Find + "') and  position() = " + ColumNumber + "]/..//a[contains(.,'" + ButtonToClick + "')]", clickSetting);
+                        break;
+                    }
+                    catch { }
+                    startr++;
+                }
+            }
+
         }
+     
         public string GetStringFromATable(By Table, string MatchOnValue, int FindInColumn, int GetValueFrom, int NumberOfPagesToCheck = 10, int TimeToWaitPerPage = 10)
         {
             string RetrivedValue = "";
@@ -415,14 +525,7 @@ namespace TestingUtilities
             return foundIt;
 
         }
-        //public void Click(by ByString, int TimeoutSeconds = 10)
-        //{
-        //    var wait = new WebDriverWait(driv, TimeSpan.FromSeconds(TimeoutSeconds));
-        //    wait.Until(driver => driv.FindElement(ByString));
-        //    scrollintoView(driv.FindElement(ByString));
-        //    IWebElement item = driv.FindElement(ByString);
-        //    Click(item, ByString.desc,TimeoutSeconds);
-        //}
+     
         public void RightClickAndSelect(By ByString, string SelectOption, int TimeoutSeconds = 10)
         {
             OptionToClick = SelectOption;
