@@ -31,9 +31,9 @@ namespace TestingUtilities
 
         public WebElem(Browser b)
         {
-            countr = 0;
-            clickSetting = b.we.clickSetting;
-            typeSetting = b.we.typeSetting;
+            
+            clickSetting = new ClickSetting() { PageTimeout = TimeSpan.FromSeconds(10), PollInterval = TimeSpan.FromMilliseconds(500) };
+            typeSetting = new TypeSetting() { PageTimeout = TimeSpan.FromSeconds(10), PollInterval = TimeSpan.FromMilliseconds(500) };
 
             this.driv = b.driv;
             lines = new List<LogItem>();
@@ -47,9 +47,15 @@ namespace TestingUtilities
         }
         public WebElem(IWebDriver Driv, ClickSetting defaultClickSettings, TypeSetting defaultTypeSetting)
         {
-            countr = 0;
+            
             clickSetting = defaultClickSettings;
             typeSetting = defaultTypeSetting;
+            driv = Driv;
+        }
+        public WebElem(IWebDriver Driv, ClickSetting defaultClickSettings)
+        {
+
+            clickSetting = defaultClickSettings;
             driv = Driv;
         }
         public WebElem()
@@ -57,7 +63,7 @@ namespace TestingUtilities
         }
         public WebElem(TestContext context)
         {
-            countr = 0;
+         
 
             int _PageTimeout;
             int _PollInterval;
@@ -85,11 +91,11 @@ namespace TestingUtilities
         bool WasSuccessful;
         private IWebElement HH;
         private IWebElement ClickOn, UntilThisIsClickable;
-        private int countr = 0;
-        private static int attempt = 0;
-        private int TimeOutSeconds = 0;
-        private int TimeOutSecondsForClickUntilClickable = 0;
-        private static System.Timers.Timer aTimer, bTimer;
+        //private int countr = 0;
+        //private static int attempt = 0;
+        //private int TimeOutSeconds = 0;
+        //private int TimeOutSecondsForClickUntilClickable = 0;
+        //private static System.Timers.Timer aTimer, bTimer;
         string OptionToClick { get; set; }
 
         
@@ -116,28 +122,25 @@ namespace TestingUtilities
             IWebElement item = driv.FindElement(ByString);
             Click(item, ByString.Description);
         }
-        public void Click(IWebElement item,string elementDescription)
+        public void Click(by ByString, Direction direction)
         {
-            countr = 0;
-
-            bool didItWork = false;
-            aTimer = new System.Timers.Timer();
-            aTimer.Interval = clickSetting.PollInterval.TotalMilliseconds;
-            aTimer.Elapsed += TimedClickOnWebElement;
-            aTimer.Enabled = true;
-            while (aTimer.Enabled == true)
-            { }
-            if (countr > clickSetting.MaxPollCount && WasSuccessful == false) 
-                    { 
-                        didItWork = false; 
-                    }
-            else if (countr <= clickSetting.MaxPollCount || WasSuccessful == true)  
-                    { 
-                        didItWork = true;
-                    }
-            aTimer.Dispose();
-            didItWork.Should().BeTrue();
-            countr = 0;
+            var wait = new WebDriverWait(driv, clickSetting.PageTimeout);
+            wait.Until(driver => driv.FindElement(ByString));
+            scrollintoView(driv.FindElement(ByString));
+            IWebElement item = driv.FindElement(ByString);
+            Click(item, ByString.Description, direction);
+        }
+        public void Click(IWebElement item,string elementDescription, Direction scrollFirst = Direction.Up)
+        {
+            int countr = 0;
+            Clicker clicker = new Clicker(driv,clickSetting);
+            clicker.Click(item, elementDescription, scrollFirst);
+        }
+        public void Click(IWebElement item, string elementDescription, ClickSetting _clickSetting,Direction scrollFirst = Direction.Up)
+        {
+            int countr = 0;
+            Clicker clicker = new Clicker(driv, _clickSetting);
+            clicker.Click(item, elementDescription, scrollFirst);
         }
 
         public void Click(by ByString, ClickSetting click)
@@ -148,29 +151,7 @@ namespace TestingUtilities
             IWebElement item = driv.FindElement(ByString);
             Click(item, ByString.Description);
         }
-        public void Click(IWebElement item,string elementDescription, ClickSetting click)
-        {
-            countr = 0;
-
-            bool didItWork = false;
-            aTimer = new System.Timers.Timer();
-            aTimer.Interval = clickSetting.PollInterval.TotalMilliseconds;
-            aTimer.Elapsed += TimedClickOnWebElement;
-            aTimer.Enabled = true;
-            while (aTimer.Enabled == true)
-            { }
-            if (countr > clickSetting.MaxPollCount && WasSuccessful == false) 
-                    { 
-                        didItWork = false; 
-                    }
-            else if (countr <= clickSetting.MaxPollCount || WasSuccessful == true)  
-                    { 
-                        didItWork = true;
-                    }
-            aTimer.Dispose();
-            didItWork.Should().BeTrue();
-            countr = 0;
-        }
+        
 
         public void Click(by Parent, string XpathToClick)
         {
@@ -194,7 +175,7 @@ namespace TestingUtilities
             wait2.Until(driver => Par.FindElement(By.XPath(XpathToClick)));
             scrollintoView(Par.FindElement(By.XPath(XpathToClick)));
             IWebElement item = Par.FindElement(By.XPath(XpathToClick));
-            Click(item, string.Format("The child at xpath='{0}' of Parent = '{1}'", XpathToClick, Parent.Description), click);
+            Click(item, string.Format("The child at xpath='{0}' of Parent = '{1}'", XpathToClick, Parent.Description));
         }
         
         public bool DidPageLoad(by THeElement, bool TrueToHighLight = false, int timeout = 10)
@@ -305,7 +286,23 @@ namespace TestingUtilities
             }
 
         }
-        public void SetCheckBox(by CheckBox, by ClickForCheck, bool ShouldBeChecked, ClickSetting clickSetting)
+        public void SetCheckBox(by CheckBox, by ClickForCheck, bool ShouldBeChecked, ClickSetting _clickSetting)
+        {
+
+            var wait = new WebDriverWait(driv, _clickSetting.PageTimeout);
+            wait.Until(driver => driv.FindElement(CheckBox));
+            scrollintoView(driv.FindElement(CheckBox));
+
+
+            bool IsCurrentlyChecked = Convert.ToBoolean(GetValue(CheckBox));
+
+            if (IsCurrentlyChecked != ShouldBeChecked)
+            {
+                Click(ClickForCheck, _clickSetting);
+            }
+
+        }
+        public void SetCheckBox(by CheckBox, by ClickForCheck, bool ShouldBeChecked)
         {
 
             var wait = new WebDriverWait(driv, clickSetting.PageTimeout);
@@ -537,20 +534,20 @@ namespace TestingUtilities
         }
         public void RightClick(IWebElement item, int TimeoutSeconds = 10)
         {
-            countr = 0;
-            bool didItWork = false;
-            HH = item;
-            TimeOutSeconds = TimeoutSeconds * 2;
-            aTimer = new System.Timers.Timer();
-            aTimer.Interval = 500;
-            aTimer.Elapsed += TimedRightClickOnWebElement;
-            aTimer.Enabled = true;
-            while (aTimer.Enabled == true)
-            { }
-            if (countr > TimeoutSeconds && WasSuccessful == false) { didItWork = false; }
-            else if (countr <= TimeoutSeconds || WasSuccessful == true) { didItWork = true; }
-            aTimer.Dispose();
-            didItWork.Should().BeTrue();
+            //int countr = 0;
+            //bool didItWork = false;
+            //HH = item;
+            //TimeOutSeconds = TimeoutSeconds * 2;
+            //System.Timers.Timer aTimer = new System.Timers.Timer();
+            //aTimer.Interval = 500;
+            //aTimer.Elapsed += TimedRightClickOnWebElement;
+            //aTimer.Enabled = true;
+            //while (aTimer.Enabled == true)
+            //{ }
+            //if (countr > TimeoutSeconds && WasSuccessful == false) { didItWork = false; }
+            //else if (countr <= TimeoutSeconds || WasSuccessful == true) { didItWork = true; }
+            //aTimer.Dispose();
+            //didItWork.Should().BeTrue();
         }
         public void SelectFromDropDown(By ElementIDentity, string ValueToSelect, double TimeoutSeconds = 10)
         {
@@ -664,84 +661,8 @@ namespace TestingUtilities
             }
             return Value;
         }
-        private void TimedClickOnWebElement(Object source, System.Timers.ElapsedEventArgs e)
-        {
-            if (countr <= TimeOutSeconds)
-            {
-                try
-                {
-                    if (countr >= 5 && countr <= 10)
-                    {
-                        scroll(HH, Direction.Up);
-                    }
-                    else if (countr >= 10)
-                    {
-                        scroll(HH, Direction.Down);
-                    }
-                    // Log("Height is "+ Convert.ToString(HH.Size.Height));
-                    HH.Click();
-                    WasSuccessful = true;
-                    aTimer.Enabled = false;
-                }
-                catch
-                {
-                    if (countr < 5)
-                    {
-                        scrollintoView(HH);
-                    }
-
-                    HighLight(HH, 1);
-                    countr++;
-                    Log(loglevel.debug, string.Format("Can't click {0} on attempt number {1}", Convert.ToString(HH), Convert.ToString(countr)));
-                }
-
-            }
-            else if (countr > TimeOutSeconds)
-            {
-                WasSuccessful = false;
-                aTimer.Enabled = false;
-            }
-        }
-        private void TimedRightClickOnWebElement(Object source, System.Timers.ElapsedEventArgs e)
-        {
-            if (countr <= TimeOutSeconds)
-            {
-                try
-                {
-                    Actions action = new Actions(driv);
-                    action.ContextClick(HH);
-                    action.Perform();
-
-                    int TimeoutSeconds = 1;
-
-                    var wait = new WebDriverWait(driv, TimeSpan.FromSeconds(TimeoutSeconds));
-
-                    wait = new WebDriverWait(driv, TimeSpan.FromSeconds(TimeoutSeconds));
-                    wait.Until(driver => driv.FindElement(By.LinkText(OptionToClick)));
-
-                    IWebElement Op = driv.FindElement(By.LinkText(OptionToClick));
-                    Op.Click();
-
-
-                    WasSuccessful = true;
-                    aTimer.Enabled = false;
-                    OptionToClick = string.Empty;
-                }
-                catch
-                {
-                    scrollintoView(HH);
-                    HighLight(HH, 1);
-                    countr++;
-                    Log(string.Format("Can't right click {0} on attempt number {1}", Convert.ToString(HH), Convert.ToString(countr)));
-                }
-
-            }
-            else if (countr > TimeOutSeconds)
-            {
-                WasSuccessful = false;
-                aTimer.Enabled = false;
-            }
-        }
+      
+        
 
         private class LogItem
         {
