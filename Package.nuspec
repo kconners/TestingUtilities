@@ -2,13 +2,13 @@
 <package >
   <metadata>
     <id>TestCentral.GUI</id>
-    <version>3.0.1</version>
+    <version>3.0.4</version>
     <authors>kconners</authors>
     <owners>kconners</owners> 
     <projectUrl>https://github.com/kconners/TestingUtil</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>A simple utility that will assist automation efforts</description>
-    <releaseNotes>Adding result writer, this currently is pointed at a local instance of TestCental</releaseNotes>
+    <releaseNotes>Added crypt and obfuscated default pw </releaseNotes>
     <copyright>Copyright 2019</copyright>
     <license type="expression">MIT</license>
     <tags>KDC</tags>
@@ -21,7 +21,6 @@
 	  <dependency id="NUnit" version="3.11.0" />
 	  <dependency id="Nunit3TestAdapter" version="3.12.0" />	  
 	  <dependency id="FluentAssertions" version="5.6.0" />
-	  <dependency id="MSTest.TestAdapter" version="1.4.0" />
 	  <dependency id="MSTest.TestAdapter" version="1.4.0" />
 	  <dependency id="DotNetSeleniumExtras.WaitHelpers" version="3.11.0" />
     </dependencies>

@@ -73,12 +73,14 @@
     <Compile Include="by.cs" />
     <Compile Include="Clicker.cs" />
     <Compile Include="DataHelper.cs" />
+    <Compile Include="Emailer.cs" />
     <Compile Include="interactionSettings.cs" />
     <Compile Include="Models\QuickResult.cs" />
     <Compile Include="Models\Rest.cs" />
     <Compile Include="Models\URL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RestHelper.cs" />
+    <Compile Include="SASS.cs" />
     <Compile Include="SettingBase.cs" />
     <Compile Include="TestCase.cs" />
     <Compile Include="TestContextExtensions.cs" />
